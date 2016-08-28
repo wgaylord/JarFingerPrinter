@@ -11,4 +11,5 @@ In the end the main file will be rewrote to be more generic and also to be pep8.
 
 
 Currently fingerprints for most MC versions and also snapshots starting that 16w22a are at https://minecraft16.ml/minecraft/jar_fingerprints
+
 It should also be noted that the fingerprints on my server are for the client jar only.
