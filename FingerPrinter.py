@@ -90,7 +90,7 @@ def GenerateFingerPrint():
                 FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.flags))
         
         #Get all method data
-        for x in ClassFiles[key].fields:
+        for x in ClassFiles[key].methods:
             if(FingerPrint[key].has_key('methods')):
                 FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.flags))
             else:
