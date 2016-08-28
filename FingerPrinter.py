@@ -103,7 +103,7 @@ def GenerateFingerPrint():
 def ExportFingerPrint(version):
     print 'Exporting Profile'
     out = json.dumps(FingerPrint)
-    open(FingerPrintPath+'/jar_fingerprint/'+version+'.json','w+').write(out)
+    open(FingerPrintPath+'/jar_fingerprints/'+version+'.json','w+').write(out)
 
     
 def Cleanup(version):
