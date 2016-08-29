@@ -84,18 +84,18 @@ def GenerateFingerPrint():
         #Get all field data
         for x in ClassFiles[key].fields:
             if(FingerPrint[key].has_key('fields')):
-                FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.flags))
+                FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
             else:
                 FingerPrint[key]['fields'] = []
-                FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.flags))
+                FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
         
         #Get all method data
         for x in ClassFiles[key].methods:
             if(FingerPrint[key].has_key('methods')):
-                FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.flags))
+                FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
             else:
                 FingerPrint[key]['methods'] = []
-                FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.flags))
+                FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
         
         FingerPrint[key]['hash'] = Hashes[key]
 
