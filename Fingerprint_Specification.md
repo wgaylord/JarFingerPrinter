@@ -22,7 +22,7 @@ Specifivation of how each fingerprint is organized.
  
  The item "fields" is all the fields defined in the class. (More on them later)
  
- The item "constants" is a dictionary. (This may be empty) It can conatin a entry named "numbers" and an entry named "strings".
+ The item "constants" is a dictionary.  It can conatin a entry named "numbers" and an entry named "strings".
  
    These are all the numbers and strings that appear inside the classes constant pool.
 
