@@ -58,7 +58,7 @@ def GenerateFingerPrint():
         FingerPrint[key] = {}
         # Get all string constants
         FingerPrint[key]["constants"] ={}
-        FingerPrint[key]["access_flags"] = key.access_flags.flags
+        FingerPrint[key]["access_flags"] = ClassFiles[key].access_flags.flags
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantString):
             if(FingerPrint[key].has_key('string')):
                 FingerPrint[key]["constants"]['string'].append(x.string.value)
