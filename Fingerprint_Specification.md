@@ -5,7 +5,7 @@ Specifivation of how each fingerprint is organized.
 ##File
  The fingerprint will be a json file containing all the information making up the finger print.
  
- The top level dictionary inside the file contains all the classes and their data. 
+ The top level dictionary inside the file contains two dictionaries one holds all the classes and their data, the other holds hashes for all none class files in the jar. 
  
 ##Classes
  Each class is a dictionary consisting of a few items:

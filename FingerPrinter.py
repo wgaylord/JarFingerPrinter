@@ -1,5 +1,4 @@
 # coding: utf-8
-import urllib
 import shutil
 import zipfile
 from jawa import ClassFile
@@ -9,109 +8,106 @@ import json
 import os
 import sys
 
-MCUrl = """https://s3.amazonaws.com/Minecraft.Download/versions/<version>/<version>.jar"""
 
 FingerPrintPath = '/web/www/minecraft'
 
 ClassFiles = {}
 Hashes = {}
 FingerPrint = {}
+FingerPrint["other"] = {}
 
-
-def DownloadJar(version):
-    print 'Downloading'
-    realUrl = MCUrl.replace('<version>', version)
-    zip = urllib.urlopen(realUrl).read()
-    open(os.getcwd() + '/jars/' + str(version) + '.jar', 'wb+').write(zip)
-
-
-def ExtractJar(version):
-    print 'Extracting'
-    zipfile.ZipFile(os.getcwd()+'/jars/'+str(version)+'.jar').extractall(os.getcwd()+'/class_files/'+version)
-    shutil.rmtree(os.getcwd()+'/class_files/'+version+'/assets',ignore_errors=True)
-    shutil.rmtree(os.getcwd()+'/class_files/'+version+'/META-INF',ignore_errors=True)
-    for root, dirs, files in os.walk("./class_files/"+version, topdown=False):
-        for name in files:
-            if not name.endswith('.class'):
-                os.remove(root+'/'+name)
 
   
-def BuildClassFiles(version):
+def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
     print 'Building ClassFiles'
-    for root, dirs, files in os.walk("./class_files/"+version, topdown=False):
-        for name in files:
-            if name.endswith('.class'):
-                hasher = hashlib.md5()
-                t = open(os.path.join(root,name),'rb')
-                temp = ClassFile(t)
-                ClassFiles[temp.this.name.value]=temp
-                t.seek(0)
-                hasher.update(t.read())
-                Hashes[temp.this.name.value]=hasher.hexdigest()
-                t.close()
+    zip = zipfile.ZipFile(jarfile)
+    #print zip.namelist()
+    files = []
+    for name in zip.namelist():
+        isokay = True
+        for x in ignoreDirs:
+            #print name.startswith(x)
+            if name.startswith(x):
+                isokay = False
+                break
+        for x in ignoreFiles:
+            if name.endswith(x):
+                isokay = False
+                break
+        if isokay == True:
+            files.append(name)
+    for name in files:
+        if name.endswith('.class'):
+            #print name
+            hasher = hashlib.md5()
+            t = zip.open(name)
+            temp = ClassFile(t)
+            ClassFiles[name.replace(".class","")]=temp
+            t = zip.open(name)
+            hasher.update(t.read())
+            Hashes[name.replace(".class","")]=hasher.hexdigest()
+            t.close()
+        elif not name.endswith("/"):
+            t = zip.open(name)
+            hasher = hashlib.md5()
+            hasher.update(t.read())
+            FingerPrint["other"][name] = hasher.hexdigest()
 
 
-def GenerateFingerPrint():
+def GenerateClassFingerPrint():
     global FingerPrint
+    FingerPrint["class"] = {}
     print 'Profiling Strings and Numbers'
     for key in ClassFiles.keys():
-        FingerPrint[key] = {}
+        FingerPrint["class"][key] = {}
         # Get all string constants
-        FingerPrint[key]["constants"] ={}
-        FingerPrint[key]["constants"]['string'] = []
-        FingerPrint[key]["constants"]['number'] = []
-        FingerPrint[key]["access_flags"] = ClassFiles[key].access_flags.value
+        FingerPrint["class"][key]["constants"] ={}
+        FingerPrint["class"][key]["constants"]['string'] = []
+        FingerPrint["class"][key]["constants"]['number'] = []
+        FingerPrint["class"][key]["access_flags"] = ClassFiles[key].access_flags.value
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantString):
-            FingerPrint[key]["constants"]['string'].append(x.string.value)
+            FingerPrint["class"][key]["constants"]['string'].append(x.string.value)
         # Get all number constants        
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantNumber):
-            FingerPrint[key]["constants"]['number'].append(str(x.value))
+            FingerPrint["class"][key]["constants"]['number'].append(str(x.value))
 
         # Get the super class        
-        FingerPrint[key]['super'] = ClassFiles[key].super_.name.value
+        FingerPrint["class"][key]['super'] = ClassFiles[key].super_.name.value
         # Get all interfaces
         for x in ClassFiles[key].interfaces:
-            if(FingerPrint[key].has_key('interfaces')):
-                FingerPrint[key]['interfaces'].append(ClassFiles[key].constants[x].name.value)
+            if(FingerPrint["class"][key].has_key('interfaces')):
+                FingerPrint["class"][key]['interfaces'].append(ClassFiles[key].constants[x].name.value)
             else:
-                FingerPrint[key]['interfaces'] = []
-                FingerPrint[key]['interfaces'].append(ClassFiles[key].constants[x].name.value)
+                FingerPrint["class"][key]['interfaces'] = []
+                FingerPrint["class"][key]['interfaces'].append(ClassFiles[key].constants[x].name.value)
         #Get all field data
         for x in ClassFiles[key].fields:
-            if(FingerPrint[key].has_key('fields')):
-                FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+            if(FingerPrint["class"][key].has_key('fields')):
+                FingerPrint["class"][key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
             else:
-                FingerPrint[key]['fields'] = []
-                FingerPrint[key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+                FingerPrint["class"][key]['fields'] = []
+                FingerPrint["class"][key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
         
         #Get all method data
         for x in ClassFiles[key].methods:
-            if(FingerPrint[key].has_key('methods')):
-                FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+            if(FingerPrint["class"][key].has_key('methods')):
+                FingerPrint["class"][key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
             else:
-                FingerPrint[key]['methods'] = []
-                FingerPrint[key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+                FingerPrint["class"][key]['methods'] = []
+                FingerPrint["class"][key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
         
-        FingerPrint[key]['hash'] = Hashes[key]
+        FingerPrint["class"][key]['hash'] = Hashes[key]
 
         
-def ExportFingerPrint(version):
+def ExportFingerPrint(jarfile):
     print 'Exporting Profile'
-    out = json.dumps(FingerPrint)
-    open(FingerPrintPath+'/jar_fingerprints/'+version+'.json','w+').write(out)
+    out = json.dumps(FingerPrint,indent=1)
+    open(jarfile.replace(".jar","")+".json",'w+').write(out)
 
     
-def Cleanup(version):
-    print 'Cleaning up'
-    shutil.rmtree(os.getcwd()+'/class_files/'+version,ignore_errors=True)
-    os.remove(os.getcwd()+'/jars/'+version+'.jar')
     
 
 if __name__ == "__main__":
-    version = sys.argv[1]
-    DownloadJar(version)
-    ExtractJar(version)
-    BuildClassFiles(version)
-    GenerateFingerPrint()
-    ExportFingerPrint(version)
-    Cleanup(version)
+    BuildClassFilesAndHash(sys.argv[1])
+    GenerateClassFingerPrint()
+    ExportFingerPrint(sys.argv[1])
