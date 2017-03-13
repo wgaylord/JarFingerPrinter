@@ -10,7 +10,7 @@ Specifivation of how each fingerprint is organized.
 ##Classes
  Each class is a dictionary consisting of a few items:
  
- The item with the key "hash" this is the hash of the class file.
+ The item with the key "hash" this is the md5 (I know not that good..) hash of the class file.
  
  The item with the key "access_flags" is the access_flags for the class. (More about this later)
  
