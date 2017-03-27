@@ -57,19 +57,19 @@ def GenerateClassFingerPrint():
         FingerPrint["class"][key] = {}
         # Get all string constants
         FingerPrint["class"][key]["constants"] ={}
-        FingerPrint["class"][key]["constants"]["class"] = []
-        FingerPrint["class"][key]["constants"]['string'] = []
-        FingerPrint["class"][key]["constants"]['number'] = []
+        FingerPrint["class"][key]["constants"]["classes"] = []
+        FingerPrint["class"][key]["constants"]['strings'] = []
+        FingerPrint["class"][key]["constants"]['numbers'] = []
         FingerPrint["class"][key]["access_flags"] = ClassFiles[key].access_flags.value
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantString):
-            FingerPrint["class"][key]["constants"]['string'].append(x.string.value)
+            FingerPrint["class"][key]["constants"]['strings'].append(x.string.value)
         # Get all number constants        
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantNumber):
-            FingerPrint["class"][key]["constants"]['number'].append(str(x.value))
+            FingerPrint["class"][key]["constants"]['numbers'].append(str(x.value))
         #Get Classes in constant poll
         for x in  ClassFiles[key].constants.find(type_=jjawa.constants.ConstantClass):
             if not x.name.value == key:
-                FingerPrint["class"][key]["constants"]["class"].append(str(x.name.value))
+                FingerPrint["class"][key]["constants"]["classes"].append(str(x.name.value))
         # Get the super class        
         FingerPrint["class"][key]['super'] = ClassFiles[key].super_.name.value
         # Get all interfaces
