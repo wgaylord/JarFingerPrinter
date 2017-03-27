@@ -9,8 +9,6 @@ import os
 import sys
 
 
-FingerPrintPath = '/web/www/minecraft'
-
 ClassFiles = {}
 Hashes = {}
 FingerPrint = {}
@@ -21,12 +19,10 @@ FingerPrint["other"] = {}
 def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
     print 'Building ClassFiles'
     zip = zipfile.ZipFile(jarfile)
-    #print zip.namelist()
     files = []
     for name in zip.namelist():
         isokay = True
         for x in ignoreDirs:
-            #print name.startswith(x)
             if name.startswith(x):
                 isokay = False
                 break
@@ -38,7 +34,6 @@ def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
             files.append(name)
     for name in files:
         if name.endswith('.class'):
-            #print name
             hasher = hashlib.md5()
             t = zip.open(name)
             temp = ClassFile(t)
@@ -62,6 +57,7 @@ def GenerateClassFingerPrint():
         FingerPrint["class"][key] = {}
         # Get all string constants
         FingerPrint["class"][key]["constants"] ={}
+        FingerPrint["class"][key]["constants"]["class"] = []
         FingerPrint["class"][key]["constants"]['string'] = []
         FingerPrint["class"][key]["constants"]['number'] = []
         FingerPrint["class"][key]["access_flags"] = ClassFiles[key].access_flags.value
@@ -70,7 +66,10 @@ def GenerateClassFingerPrint():
         # Get all number constants        
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantNumber):
             FingerPrint["class"][key]["constants"]['number'].append(str(x.value))
-
+        #Get Classes in constant poll
+        for x in  ClassFiles[key].constants.find(type_=jjawa.constants.ConstantClass):
+            if not x.name.value == key:
+                FingerPrint["class"][key]["constants"]["class"].append(str(x.name.value))
         # Get the super class        
         FingerPrint["class"][key]['super'] = ClassFiles[key].super_.name.value
         # Get all interfaces
