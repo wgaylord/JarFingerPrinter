@@ -1,13 +1,13 @@
-#Fingerprint Specification
+# Fingerprint Specification
 
 Specifivation of how each fingerprint is organized.
 
-##File
+## File
  The fingerprint will be a json file containing all the information making up the finger print.
  
  The top level dictionary inside the file contains two dictionaries one holds all the classes and their data, the other holds hashes for all none class files in the jar. 
  
-##Classes
+## Classes
  Each class is a dictionary consisting of a few items:
  
  The item with the key "hash" this is the md5 (I know not that good..) hash of the class file.
@@ -26,7 +26,7 @@ Specifivation of how each fingerprint is organized.
  
    These are all the numbers, strings and, classes that appear inside the classes constant pool.
 
-##Access Flags
+## Access Flags
  The access flags determine the modifiers on the class, method or field.
  
  In the finger print they are saved as a number in which each bit of the number specifies the type of flag and if it is true or not.
@@ -58,13 +58,13 @@ Specifivation of how each fingerprint is organized.
  'acc_synthetic': 0x1000
  
  
-##Methods
+## Methods
  Within the Methods array there are arrays.
  
  Each array consists of firstly the name of the method. Then its descriptors (Return types and argument types). And lastly its Access 
  Flags.
  
-##Fields
+## Fields
  Within the Fields array there are arrays, much like with methods.
  
  Each array contains the name, the descriptors (The type) and its access flags.
