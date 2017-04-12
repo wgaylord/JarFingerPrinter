@@ -67,7 +67,7 @@ def GenerateClassFingerPrint():
         for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantNumber):
             FingerPrint["class"][key]["constants"]['numbers'].append(str(x.value))
         #Get Classes in constant poll
-        for x in  ClassFiles[key].constants.find(type_=jjawa.constants.ConstantClass):
+        for x in  ClassFiles[key].constants.find(type_=jawa.constants.ConstantClass):
             if not x.name.value == key:
                 FingerPrint["class"][key]["constants"]["classes"].append(str(x.name.value))
         # Get the super class        
