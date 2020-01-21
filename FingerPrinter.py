@@ -17,7 +17,7 @@ FingerPrint["other"] = {}
 
 
   
-def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
+def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = [],keepDirs=[]):
     print('Building ClassFiles')
     zip = zipfile.ZipFile(jarfile)
     files = []
@@ -25,8 +25,10 @@ def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
         isokay = True
         for x in ignoreDirs:
             if name.startswith(x):
-                isokay = False
-                break
+                for y in keepDirs:
+                    if not name.startswith(y):
+                        isokay = False
+                        break
         for x in ignoreFiles:
             if name.endswith(x):
                 isokay = False

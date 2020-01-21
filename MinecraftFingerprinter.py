@@ -27,6 +27,6 @@ if __name__ == "__main__":
     version = sys.argv[1]
     side = sys.argv[2]
     DownloadJar(version,side)
-    FingerPrinter.BuildClassFilesAndHash(str(version)+"_"+side + '.jar',ignoreFiles=[".xsd",".xml",".dtd","der"])
+    FingerPrinter.BuildClassFilesAndHash(str(version)+"_"+side + '.jar',ignoreDirs=["commons-logging","ca","oshi-project","it","commons-io","io","org","net","com","commons-codec"],ignoreFiles=[".xsd",".xml",".dtd","der"],keepDirs=["net/minecraft","com/mojang"])
     FingerPrinter.GenerateClassFingerPrint()
     FingerPrinter.ExportFingerPrint(version+".jar")
