@@ -8,7 +8,7 @@ import json
 import os
 import sys
 from tqdm import tqdm
-
+import gzip
 
 ClassFiles = {}
 Hashes = {}
@@ -103,8 +103,8 @@ def GenerateClassFingerPrint():
         
 def ExportFingerPrint(jarfile):
     print('Exporting Profile')
-    out = json.dumps(FingerPrint)
-    open(jarfile.replace(".jar","")+".json",'w+').write(out)
+    out = bytes(json.dumps(FingerPrint),"utf8")
+    open(jarfile.replace(".jar","")+".json.gz",'wb+').write(gzip.compress(out))
 
     
     
