@@ -1,20 +1,32 @@
 import FingerPrinter
 import sys
 import os
-import urllib
+import urllib.request
+import requests
 
 
-MCUrl = """https://s3.amazonaws.com/Minecraft.Download/versions/<version>/<version>.jar"""
+versionData = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
 
-def DownloadJar(version):
-    print 'Downloading'
-    realUrl = MCUrl.replace('<version>', version)
-    zip = urllib.urlopen(realUrl).read()
-    open(str(version) + '.jar', 'wb+').write(zip)
+def getVersionURL(version):
+    data = requests.get(versionData).json()
+    versions = data["versions"]
+    for x in versions:
+        if x["id"] == version:
+            return x["url"]
+        
+    
+
+def DownloadJar(version,side):
+    print('Downloading')
+    data = requests.get(getVersionURL(version)).json()["downloads"]
+    url = data[side]["url"]
+    zip = urllib.request.urlopen(url).read()
+    open(str(version)+"_"+side + '.jar', 'wb+').write(zip)
 
 if __name__ == "__main__":    
     version = sys.argv[1]
-    DownloadJar(version)
-    FingerPrinter.BuildClassFilesAndHash(version+".jar",ignoreDirs=["io","assets","com","it","org","javax","META-INF"],ignoreFiles=[".xsd",".xml",".dtd","der"])
+    side = sys.argv[2]
+    DownloadJar(version,side)
+    FingerPrinter.BuildClassFilesAndHash(str(version)+"_"+side + '.jar',ignoreFiles=[".xsd",".xml",".dtd","der"])
     FingerPrinter.GenerateClassFingerPrint()
     FingerPrinter.ExportFingerPrint(version+".jar")

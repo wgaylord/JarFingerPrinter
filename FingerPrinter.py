@@ -1,12 +1,13 @@
 # coding: utf-8
 import shutil
 import zipfile
-from jawa import ClassFile
+from jawa.cf import ClassFile
 import hashlib
 import jawa
 import json
 import os
 import sys
+from tqdm import tqdm
 
 
 ClassFiles = {}
@@ -17,7 +18,7 @@ FingerPrint["other"] = {}
 
   
 def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
-    print 'Building ClassFiles'
+    print('Building ClassFiles')
     zip = zipfile.ZipFile(jarfile)
     files = []
     for name in zip.namelist():
@@ -32,7 +33,7 @@ def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
                 break
         if isokay == True:
             files.append(name)
-    for name in files:
+    for name in tqdm(files):
         if name.endswith('.class'):
             hasher = hashlib.md5()
             t = zip.open(name)
@@ -52,8 +53,8 @@ def BuildClassFilesAndHash(jarfile,ignoreDirs = [],ignoreFiles = []):
 def GenerateClassFingerPrint():
     global FingerPrint
     FingerPrint["class"] = {}
-    print 'Profiling Strings and Numbers'
-    for key in ClassFiles.keys():
+    print('Profiling Strings and Numbers')
+    for key in tqdm(ClassFiles.keys()):
         FingerPrint["class"][key] = {}
         # Get all string constants
         FingerPrint["class"][key]["constants"] ={}
@@ -61,10 +62,10 @@ def GenerateClassFingerPrint():
         FingerPrint["class"][key]["constants"]['strings'] = []
         FingerPrint["class"][key]["constants"]['numbers'] = []
         FingerPrint["class"][key]["access_flags"] = ClassFiles[key].access_flags.value
-        for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantString):
+        for x in ClassFiles[key].constants.find(type_=jawa.constants.String):
             FingerPrint["class"][key]["constants"]['strings'].append(x.string.value)
         # Get all number constants        
-        for x in ClassFiles[key].constants.find(type_=jawa.constants.ConstantNumber):
+        for x in ClassFiles[key].constants.find(type_=jawa.constants.Number):
             FingerPrint["class"][key]["constants"]['numbers'].append(str(x.value))
         #Get Classes in constant poll
         for x in  ClassFiles[key].constants.find(type_=jawa.constants.ConstantClass):
@@ -74,14 +75,14 @@ def GenerateClassFingerPrint():
         FingerPrint["class"][key]['super'] = ClassFiles[key].super_.name.value
         # Get all interfaces
         for x in ClassFiles[key].interfaces:
-            if(FingerPrint["class"][key].has_key('interfaces')):
-                FingerPrint["class"][key]['interfaces'].append(ClassFiles[key].constants[x].name.value)
+            if('interfaces' in FingerPrint["class"][key].keys()):
+                FingerPrint["class"][key]['interfaces'].append(x.name.value)
             else:
                 FingerPrint["class"][key]['interfaces'] = []
-                FingerPrint["class"][key]['interfaces'].append(ClassFiles[key].constants[x].name.value)
+                FingerPrint["class"][key]['interfaces'].append(x.name.value)
         #Get all field data
         for x in ClassFiles[key].fields:
-            if(FingerPrint["class"][key].has_key('fields')):
+            if('fields' in FingerPrint["class"][key].keys()):
                 FingerPrint["class"][key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
             else:
                 FingerPrint["class"][key]['fields'] = []
@@ -89,7 +90,7 @@ def GenerateClassFingerPrint():
         
         #Get all method data
         for x in ClassFiles[key].methods:
-            if(FingerPrint["class"][key].has_key('methods')):
+            if('methods' in FingerPrint["class"][key].keys()):
                 FingerPrint["class"][key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
             else:
                 FingerPrint["class"][key]['methods'] = []
@@ -99,8 +100,8 @@ def GenerateClassFingerPrint():
 
         
 def ExportFingerPrint(jarfile):
-    print 'Exporting Profile'
-    out = json.dumps(FingerPrint,indent=1)
+    print('Exporting Profile')
+    out = json.dumps(FingerPrint)
     open(jarfile.replace(".jar","")+".json",'w+').write(out)
 
     
