@@ -72,7 +72,7 @@ def GenerateClassFingerPrint():
         #Get Classes in constant poll
         for x in  ClassFiles[key].constants.find(type_=lawu.constants.ConstantClass):
             if not x.name.value == key:
-                FingerPrint["class"][key]["constants"]["classes"].append(str(x.name))
+                FingerPrint["class"][key]["constants"]["classes"].append(str(x.name.value))
         # Get the super class        
         FingerPrint["class"][key]['super'] = ClassFiles[key].super_
         # Get all interfaces
@@ -101,10 +101,10 @@ def GenerateClassFingerPrint():
         FingerPrint["class"][key]['hash'] = Hashes[key]
 
         
-def ExportFingerPrint(jarfile):
+def ExportFingerPrint(jarfile,path=""):
     print('Exporting Profile')
     out = bytes(json.dumps(FingerPrint),"utf8")
-    open(jarfile.replace(".jar","")+".json.gz",'wb+').write(gzip.compress(out))
+    open(path + jarfile.replace(".jar","")+".json.gz",'wb+').write(gzip.compress(out))
 
     
     

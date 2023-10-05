@@ -36,9 +36,11 @@ if __name__ == "__main__":
         zip_in.close()
         out.close()
         zip.close()
+        os.remove(str(version)+"_"+side + '_temp.jar')
     else:
         zip.close()
         os.rename(str(version)+"_"+side + '_temp.jar',str(version)+"_"+side + '.jar')
     FingerPrinter.BuildClassFilesAndHash(str(version)+"_"+side + '.jar',ignoreDirs=["commons-logging","ca","oshi-project","it","commons-io","io","org","net","com","commons-codec"],ignoreFiles=[".xsd",".xml",".dtd","der"],keepDirs=["net/minecraft","com/mojang"])
     FingerPrinter.GenerateClassFingerPrint()
     FingerPrinter.ExportFingerPrint(version+".jar")
+    os.remove(str(version)+"_"+side + '.jar')
