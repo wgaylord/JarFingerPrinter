@@ -1,3 +1,3 @@
-jawa==2.2.0
+-e git+https://github.com/TkTech/Lawu@2540c552fa8294de9f57918a5cb6aef7081d8e8f#egg=lawu
 tqdm
 requests

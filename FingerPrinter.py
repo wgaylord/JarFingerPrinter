@@ -1,9 +1,9 @@
 # coding: utf-8
 import shutil
 import zipfile
-from jawa.cf import ClassFile
+from lawu.cf import ClassFile
 import hashlib
-import jawa
+import lawu
 import json
 import os
 import sys
@@ -64,39 +64,39 @@ def GenerateClassFingerPrint():
         FingerPrint["class"][key]["constants"]['strings'] = []
         FingerPrint["class"][key]["constants"]['numbers'] = []
         FingerPrint["class"][key]["access_flags"] = ClassFiles[key].access_flags.value
-        for x in ClassFiles[key].constants.find(type_=jawa.constants.String):
+        for x in ClassFiles[key].constants.find(type_=lawu.constants.String):
             FingerPrint["class"][key]["constants"]['strings'].append(x.string.value)
         # Get all number constants        
-        for x in ClassFiles[key].constants.find(type_=jawa.constants.Number):
+        for x in ClassFiles[key].constants.find(type_=lawu.constants.Number):
             FingerPrint["class"][key]["constants"]['numbers'].append(str(x.value))
         #Get Classes in constant poll
-        for x in  ClassFiles[key].constants.find(type_=jawa.constants.ConstantClass):
+        for x in  ClassFiles[key].constants.find(type_=lawu.constants.ConstantClass):
             if not x.name.value == key:
-                FingerPrint["class"][key]["constants"]["classes"].append(str(x.name.value))
+                FingerPrint["class"][key]["constants"]["classes"].append(str(x.name))
         # Get the super class        
-        FingerPrint["class"][key]['super'] = ClassFiles[key].super_.name.value
+        FingerPrint["class"][key]['super'] = ClassFiles[key].super_
         # Get all interfaces
         for x in ClassFiles[key].interfaces:
             if('interfaces' in FingerPrint["class"][key].keys()):
-                FingerPrint["class"][key]['interfaces'].append(x.name.value)
+                FingerPrint["class"][key]['interfaces'].append(x.descriptor)
             else:
                 FingerPrint["class"][key]['interfaces'] = []
-                FingerPrint["class"][key]['interfaces'].append(x.name.value)
+                FingerPrint["class"][key]['interfaces'].append(x.descriptor)
         #Get all field data
         for x in ClassFiles[key].fields:
             if('fields' in FingerPrint["class"][key].keys()):
-                FingerPrint["class"][key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+                FingerPrint["class"][key]['fields'].append((x.name,x.descriptor,x.access_flags.value))
             else:
                 FingerPrint["class"][key]['fields'] = []
-                FingerPrint["class"][key]['fields'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+                FingerPrint["class"][key]['fields'].append((x.name,x.descriptor,x.access_flags.value))
         
         #Get all method data
         for x in ClassFiles[key].methods:
             if('methods' in FingerPrint["class"][key].keys()):
-                FingerPrint["class"][key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+                FingerPrint["class"][key]['methods'].append((x.name,x.descriptor,x.access_flags.value))
             else:
                 FingerPrint["class"][key]['methods'] = []
-                FingerPrint["class"][key]['methods'].append((x.name.value,x.descriptor.value,x.access_flags.value))
+                FingerPrint["class"][key]['methods'].append((x.name,x.descriptor,x.access_flags.value))
         
         FingerPrint["class"][key]['hash'] = Hashes[key]
 
